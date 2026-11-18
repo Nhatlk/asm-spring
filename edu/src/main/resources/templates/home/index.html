@@ -1,0 +1,73 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: layout(~{::title}, ~{::section})}">
+  <head>
+    <title th:text="#{menu.home}">Trang chủ</title>
+  </head>
+  <body>
+    <section>
+      <!-- Thông tin giới thiệu ngắn từ Controller -->
+      <div class="p-4 mb-4 bg-white rounded-3 shadow-sm border-start border-primary border-5">
+        <h3 class="fw-bold text-primary" th:text="${systemName}">Tên hệ thống</h3>
+        <p class="mb-0 text-secondary" th:text="${shortDesc}">Mô tả ngắn</p>
+      </div>
+
+      <!-- Thống kê tổng quan -->
+      <div class="row g-3 mb-4 text-center">
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 p-3">
+            <h6 class="text-muted" th:text="#{home.stats.packages}">Tổng số gói tư vấn</h6>
+            <h2 class="fw-bold text-primary mb-0" th:text="${totalPackages}">0</h2>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 p-3">
+            <h6 class="text-muted" th:text="#{home.stats.bookings}">Tổng lượt đặt lịch</h6>
+            <h2 class="fw-bold text-success mb-0" th:text="${totalBookings}">0</h2>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow-sm border-0 p-3">
+            <h6 class="text-muted" th:text="#{home.stats.consultants}">Chuyên viên đồng hành</h6>
+            <h2 class="fw-bold text-info mb-0" th:text="${#lists.size(consultants)}">0</h2>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh sách gói tư vấn nổi bật -->
+      <h4 class="fw-bold mb-3 border-bottom pb-2" th:text="#{home.featured.packages}">Gói Tư Vấn Nổi Bật</h4>
+      <div class="row g-4 mb-5">
+        <div class="col-md-6" th:each="pkg : ${featuredPackages}">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body">
+              <span class="badge bg-info text-dark mb-2" th:text="${pkg.category.name}">Loại</span>
+              <h5 class="card-title fw-bold" th:text="${pkg.name}">Tên gói</h5>
+              <p class="card-text text-muted small" th:text="${pkg.description}">Mô tả</p>
+              <div class="d-flex justify-content-between align-items-center mt-3">
+                <span class="fs-5 fw-bold text-danger">
+                  <span th:text="${#numbers.formatDecimal(pkg.price, 0, 'COMMA', 0, 'POINT')}">0</span> đ
+                  <small class="text-muted fs-6">/ <span th:text="${pkg.duration}">60</span> phút</small>
+                </span>
+                <div>
+                  <a th:href="@{/consultation/detail/{id}(id=${pkg.id})}" class="btn btn-sm btn-outline-primary" th:text="#{btn.detail}">Xem chi tiết</a>
+                  <a th:href="@{/booking/form(packageId=${pkg.id})}" class="btn btn-sm btn-primary" th:text="#{btn.book}">Đặt lịch</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danh sách chuyên viên tiêu biểu -->
+      <h4 class="fw-bold mb-3 border-bottom pb-2" th:text="#{home.featured.consultants}">Chuyên Viên Tiêu Biểu</h4>
+      <div class="row g-3">
+        <div class="col-md-3" th:each="con : ${consultants}">
+          <div class="card h-100 shadow-sm border-0 text-center p-3">
+            <h6 class="fw-bold text-dark mb-1" th:text="${con.fullName}">Tên chuyên viên</h6>
+            <p class="text-primary small mb-1" th:text="${con.specialty}">Chuyên môn</p>
+            <small class="text-muted" th:text="${con.email}">Email</small>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

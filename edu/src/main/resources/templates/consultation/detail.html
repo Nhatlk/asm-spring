@@ -1,0 +1,65 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: layout(~{::title}, ~{::section})}">
+  <head>
+    <title th:text="${pkg.name}">Chi tiết gói tư vấn</title>
+  </head>
+  <body>
+    <section>
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a th:href="@{/home/index}" th:text="#{menu.home}">Trang chủ</a></li>
+          <li class="breadcrumb-item"><a th:href="@{/consultation/list}" th:text="#{menu.packages}">Gói tư vấn</a></li>
+          <li class="breadcrumb-item active" th:text="${pkg.name}">Chi tiết</li>
+        </ol>
+      </nav>
+
+      <!-- THÔNG TIN CHI TIẾT GÓI TƯ VẤN -->
+      <div class="card shadow-sm border-0 p-4 mb-4 bg-white" th:object="${pkg}">
+        <div class="row">
+          <div class="col-md-8">
+            <div class="mb-2">
+              <span class="badge bg-info text-dark me-2" th:text="*{category.name}">Loại</span>
+              <span class="badge" th:classappend="*{active} ? 'bg-success' : 'bg-secondary'" th:text="*{active} ? 'Đang mở đăng ký' : 'Tạm ngưng'"></span>
+            </div>
+            <h3 class="fw-bold text-primary mb-3" th:text="*{name}">Tên gói tư vấn</h3>
+            <p class="lead fs-6 text-secondary" th:text="*{description}">Mô tả chi tiết</p>
+
+            <div class="bg-light p-3 rounded mt-3">
+              <h6 class="fw-bold mb-2">Thông tin Chuyên viên phụ trách:</h6>
+              <p class="mb-1"><strong>Họ và tên:</strong> <span th:text="*{consultant.fullName}"></span></p>
+              <p class="mb-1"><strong>Chuyên môn:</strong> <span th:text="*{consultant.specialty}"></span></p>
+              <p class="mb-0"><strong>Email:</strong> <span th:text="*{consultant.email}"></span></p>
+            </div>
+          </div>
+
+          <div class="col-md-4 border-start d-flex flex-column justify-content-center align-items-center text-center p-3">
+            <p class="text-muted mb-1">Chi phí trọn gói</p>
+            <h2 class="fw-bold text-danger mb-2"><span th:text="*{#numbers.formatDecimal(price, 0, 'COMMA', 0, 'POINT')}"></span> đ</h2>
+            <p class="badge bg-warning text-dark mb-3">Thời lượng: <span th:text="*{duration}"></span> phút (1-1 Online/Offline)</p>
+
+            <a th:if="*{active}" th:href="@{/booking/form(packageId=*{id})}" class="btn btn-primary btn-lg w-100 mb-2" th:text="#{btn.book}">Đặt lịch ngay</a>
+            <button th:unless="*{active}" class="btn btn-secondary btn-lg w-100 mb-2" disabled>Tạm ngưng nhận lịch</button>
+            <a th:href="@{/consultation/list}" class="btn btn-outline-secondary btn-sm w-100"> Quay lại danh sách </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- DANH SÁCH GÓI TƯ VẤN CÙNG LOẠI -->
+      <h5 class="fw-bold mb-3 border-bottom pb-2" th:text="#{pkg.related}">Các Gói Tư Vấn Cùng Loại</h5>
+      <div th:if="${#lists.isEmpty(relatedPackages)}" class="text-muted small">Không có gói tư vấn nào khác trong cùng danh mục này.</div>
+      <div class="row g-3" th:unless="${#lists.isEmpty(relatedPackages)}">
+        <div class="col-md-6" th:each="rel : ${relatedPackages}">
+          <div class="card shadow-sm border-0 p-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="fw-bold mb-1" th:text="${rel.name}"></h6>
+                <span class="text-danger fw-bold small" th:text="${#numbers.formatDecimal(rel.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+              </div>
+              <a th:href="@{|/consultation/detail/${rel.id}|}" class="btn btn-sm btn-outline-primary" th:text="#{btn.detail}">Xem</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

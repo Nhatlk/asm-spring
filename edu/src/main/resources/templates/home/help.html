@@ -1,0 +1,22 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: layout(~{::title}, ~{::section})}">
+  <head>
+    <title th:text="#{menu.help}">Trợ giúp</title>
+  </head>
+  <body>
+    <section>
+      <div class="card shadow-sm border-0 p-4">
+        <h3 class="fw-bold text-primary mb-3" th:text="#{menu.help}">Trợ giúp & Câu hỏi thường gặp</h3>
+        <div class="mb-3">
+          <h6 class="fw-bold">1. Làm sao để đổi lịch hoặc hủy lịch tư vấn?</h6>
+          <p class="text-muted">Sinh viên có thể vào mục "Lịch đã đặt" trên thanh menu để xem chi tiết hoặc gửi yêu cầu hỗ trợ.</p>
+        </div>
+        <div class="mb-3">
+          <h6 class="fw-bold">2. Tôi có thể đính kèm CV trước buổi tư vấn không?</h6>
+          <p class="text-muted">Có, tại trang Form đặt lịch có mục Upload tài liệu/minh chứng để bạn gửi trước CV cho chuyên viên.</p>
+        </div>
+        <div class="alert alert-info mb-0"><strong>Hotline hỗ trợ:</strong> <span th:text="${hotline}"></span> | <strong>Email:</strong> <span th:text="${supportEmail}"></span></div>
+      </div>
+    </section>
+  </body>
+</html>

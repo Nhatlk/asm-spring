@@ -1,0 +1,99 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/main-layout :: layout(~{::title}, ~{::section})}">
+  <head>
+    <title th:text="#{pkg.list.title}">Danh sách gói tư vấn</title>
+  </head>
+  <body>
+    <section>
+      <h3 class="fw-bold text-primary mb-3" th:text="#{pkg.list.title}">Danh Sách Gói Tư Vấn</h3>
+
+      <!-- KHU VỰC TÌM KIẾM & LỌC -->
+      <div class="card shadow-sm border-0 p-3 mb-4 bg-white">
+        <div class="row g-3 align-items-end">
+          <!-- 1. Form tìm theo từ khóa -->
+          <div class="col-md-5">
+            <form th:action="@{/consultation/search}" method="get" class="d-flex gap-2">
+              <input type="text" name="keyword" th:value="${keyword}" class="form-control" th:placeholder="#{pkg.search.keyword}" />
+              <button type="submit" class="btn btn-primary text-nowrap" th:text="#{pkg.search.btn}">Tìm</button>
+            </form>
+          </div>
+
+          <!-- 2. Form tìm theo khoảng giá -->
+          <div class="col-md-7">
+            <form th:action="@{/consultation/search-price}" method="get" class="row g-2 align-items-center">
+              <div class="col-auto">
+                <span class="fw-bold small text-secondary" th:text="#{pkg.filter.price}">Lọc giá:</span>
+              </div>
+              <div class="col">
+                <input type="number" name="min" th:value="${min}" class="form-control form-control-sm" placeholder="Giá từ (Min)" />
+              </div>
+              <div class="col">
+                <input type="number" name="max" th:value="${max}" class="form-control form-control-sm" placeholder="Đến (Max)" />
+              </div>
+              <div class="col-auto">
+                <button type="submit" class="btn btn-sm btn-success">Lọc giá</button>
+                <a th:href="@{/consultation/list}" class="btn btn-sm btn-outline-secondary" th:text="#{pkg.filter.all}">Tất cả</a>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 3. Thanh lọc nhanh theo Loại tư vấn (@PathVariable) -->
+        <div class="mt-3 pt-2 border-top d-flex flex-wrap gap-2 align-items-center">
+          <span class="small fw-bold text-muted me-1">Loại tư vấn:</span>
+          <a th:href="@{/consultation/list}" class="btn btn-sm" th:classappend="${selectedCategory == null} ? 'btn-dark' : 'btn-outline-dark'" th:text="#{pkg.filter.all}">Tất cả</a>
+
+          <a th:each="cat : ${categories}" th:href="@{|/consultation/category/${cat.id}|}" th:text="${cat.name}" class="btn btn-sm" th:classappend="${selectedCategory == cat.id} ? 'btn-primary' : 'btn-outline-primary'"> </a>
+        </div>
+      </div>
+
+      <!-- Thông báo điều kiện lọc hiện tại -->
+      <div th:if="${filterMessage != null}" class="alert alert-light border py-2 small text-secondary mb-3">
+        <span th:text="${filterMessage}"></span>
+        (Tìm thấy <strong th:text="${#lists.size(packages)}">0</strong> gói tư vấn)
+      </div>
+
+      <!-- THÔNG BÁO KHI KHÔNG TÌM THẤY DỮ LIỆU -->
+      <div th:if="${#lists.isEmpty(packages)}" class="alert alert-warning text-center p-4 shadow-sm">
+        <h5 class="mb-1" th:text="#{pkg.empty}">Không tìm thấy dữ liệu!</h5>
+        <a th:href="@{/consultation/list}" class="btn btn-sm btn-outline-dark mt-2">Quay lại danh sách</a>
+      </div>
+
+      <!-- DANH SÁCH GÓI TƯ VẤN -->
+      <div class="row g-4" th:unless="${#lists.isEmpty(packages)}">
+        <div class="col-md-6" th:each="pkg, stat : ${packages}">
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <a th:href="@{|/consultation/category/${pkg.category.id}|}" class="badge bg-info text-dark text-decoration-none" th:text="${pkg.category.name}">Loại</a>
+
+                  <!-- Class CSS động theo trạng thái Active (Yêu cầu MVC-06) -->
+                  <span class="badge" th:classappend="${pkg.active} ? 'bg-success' : 'bg-secondary'" th:text="${pkg.active} ? 'Đang nhận lịch' : 'Tạm ngưng'"> </span>
+                </div>
+
+                <h5 class="card-title fw-bold">
+                  <span class="text-muted small" th:text="|#${stat.count}.|"></span>
+                  <span th:text="${pkg.name}">Tên gói</span>
+                </h5>
+                <p class="text-muted small mb-2" th:text="${pkg.description}">Mô tả</p>
+                <p class="small mb-2"><strong>Chuyên viên:</strong> <span th:text="${pkg.consultant.fullName}"></span> (<span class="text-primary" th:text="${pkg.consultant.specialty}"></span>)</p>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-2">
+                <div>
+                  <span class="fs-5 fw-bold text-danger" th:text="${#numbers.formatDecimal(pkg.price, 0, 'COMMA', 0, 'POINT')} + ' đ'"></span>
+                  <span class="text-muted small">/ <span th:text="${pkg.duration}"></span> phút</span>
+                </div>
+                <div class="d-flex gap-2">
+                  <a th:href="@{|/consultation/detail/${pkg.id}|}" class="btn btn-sm btn-outline-primary" th:text="#{btn.detail}">Chi tiết</a>
+                  <a th:if="${pkg.active}" th:href="@{/booking/form(packageId=${pkg.id})}" class="btn btn-sm btn-primary" th:text="#{btn.book}">Đặt lịch</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
